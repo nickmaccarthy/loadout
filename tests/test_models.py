@@ -117,15 +117,9 @@ class TestInstallSummary:
 
         summary = InstallSummary(
             results=[
-                InstallResult(
-                    artifact=artifact, agent=agent, status=InstallStatus.INSTALLED
-                ),
-                InstallResult(
-                    artifact=artifact, agent=agent, status=InstallStatus.SKIPPED
-                ),
-                InstallResult(
-                    artifact=artifact, agent=agent, status=InstallStatus.FAILED
-                ),
+                InstallResult(artifact=artifact, agent=agent, status=InstallStatus.INSTALLED),
+                InstallResult(artifact=artifact, agent=agent, status=InstallStatus.SKIPPED),
+                InstallResult(artifact=artifact, agent=agent, status=InstallStatus.FAILED),
                 InstallResult(
                     artifact=artifact,
                     agent=agent,

@@ -53,16 +53,11 @@ class TestDiscoverArtifacts:
 
         skill_dir = artifacts_dir / "my-skill"
         skill_dir.mkdir()
-        (skill_dir / "SKILL.md").write_text(
-            "---\ndescription: Manifest skill\n---\n# Skill\n"
-        )
+        (skill_dir / "SKILL.md").write_text("---\ndescription: Manifest skill\n---\n# Skill\n")
 
         manifest = artifacts_dir / "loadout.yaml"
         manifest.write_text(
-            "artifacts:\n"
-            "  - name: my-skill\n"
-            "    type: skill\n"
-            "    path: my-skill\n"
+            "artifacts:\n  - name: my-skill\n    type: skill\n    path: my-skill\n"
         )
 
         artifacts = discover_artifacts(artifacts_dir)

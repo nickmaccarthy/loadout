@@ -7,10 +7,7 @@ from loadout.callbacks import NoOpCallbacks
 from loadout.installer import install, install_all
 from loadout.models import (
     Artifact,
-    ArtifactFrontmatter,
-    ArtifactType,
     DetectedAgent,
-    InstallStatus,
 )
 from loadout.registry import get_default_registry
 
@@ -62,9 +59,7 @@ class TestInstall:
         self, sample_skill_artifact: Artifact, claude_agent: DetectedAgent
     ):
         callbacks = NoOpCallbacks()
-        summary = install(
-            [sample_skill_artifact], [claude_agent], callbacks=callbacks
-        )
+        summary = install([sample_skill_artifact], [claude_agent], callbacks=callbacks)
         assert len(summary.installed) == 1
 
     def test_install_to_multiple_agents(
@@ -73,9 +68,7 @@ class TestInstall:
         claude_agent: DetectedAgent,
         cursor_agent: DetectedAgent,
     ):
-        summary = install(
-            [sample_skill_artifact], [claude_agent, cursor_agent]
-        )
+        summary = install([sample_skill_artifact], [claude_agent, cursor_agent])
         assert len(summary.installed) == 2
 
     def test_install_unknown_agent(self, sample_skill_artifact: Artifact, tmp_home: Path):

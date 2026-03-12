@@ -95,9 +95,7 @@ class TestCursorAdapter:
             artifact_type=ArtifactType.RULE,
             source_path=sample_artifacts_dir / "security" / "auth-rule" / "RULE.md",
             category="security",
-            frontmatter=ArtifactFrontmatter(
-                description="Auth rule", always_apply=True
-            ),
+            frontmatter=ArtifactFrontmatter(description="Auth rule", always_apply=True),
         )
         result = self.adapter.install(artifact, agent)
         assert result.status == InstallStatus.INSTALLED
