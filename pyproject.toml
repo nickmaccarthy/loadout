@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "loadout"
+name = "agent-loadout"
 dynamic = ["version"]
 description = "Install artifacts (skills, rules, agents, commands) into coding agents"
 readme = "README.md"
@@ -38,7 +38,8 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/nickmaccarthy/loadout"
-Repository = "https://github.com/nickmaccarthy/loadout"
+Issues = "https://github.com/nickmaccarthy/loadout/issues"
+Repository = "https://github.com/nickmaccarthy/loadout.git"
 
 [tool.hatch.version]
 path = "src/loadout/_version.py"
