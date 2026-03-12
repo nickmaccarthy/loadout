@@ -41,6 +41,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    outputs:
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,46 +67,40 @@ jobs:
           conventional-changelog-conventionalcommits
 
       - name: Run semantic-release
+        id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+        run: |
+          OUTPUT=$(npx semantic-release 2>&1) || true
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q "Published release"; then
+            VERSION=$(echo "$OUTPUT" | grep -oP 'Published release \K[0-9]+\.[0-9]+\.[0-9]+')
+            echo "new_release_published=true" >> "$GITHUB_OUTPUT"
+            echo "new_release_version=$VERSION" >> "$GITHUB_OUTPUT"
+          else
+            echo "new_release_published=false" >> "$GITHUB_OUTPUT"
+          fi
 
   publish:
     needs: release
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: needs.release.outputs.new_release_published == 'true'
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
 
-      - name: Check if version was bumped
-        id: version-check
-        run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
-          LATEST_COMMIT=$(git log -1 --format=%H)
-          TAG_COMMIT=$(git rev-list -n 1 "$LATEST_TAG" 2>/dev/null || echo "none")
-          if [ "$LATEST_TAG" = "none" ] || [ "$TAG_COMMIT" != "$LATEST_COMMIT" ]; then
-            echo "should_publish=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_publish=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Install uv
-        if: steps.version-check.outputs.should_publish == 'true'
         uses: astral-sh/setup-uv@v4
 
       - name: Set up Python
-        if: steps.version-check.outputs.should_publish == 'true'
         run: uv python install 3.12
 
       - name: Build package
-        if: steps.version-check.outputs.should_publish == 'true'
         run: uv build
 
       - name: Publish to PyPI
-        if: steps.version-check.outputs.should_publish == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
