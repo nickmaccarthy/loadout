@@ -60,9 +60,7 @@ def _discover_from_manifest(manifest_path: Path, source_dir: Path) -> list[Artif
     if not isinstance(raw, dict) or "artifacts" not in raw:
         raise ManifestError("Manifest must contain an 'artifacts' key")
 
-    manifest = Manifest(
-        artifacts=[ManifestArtifact(**entry) for entry in raw["artifacts"]]
-    )
+    manifest = Manifest(artifacts=[ManifestArtifact(**entry) for entry in raw["artifacts"]])
 
     artifacts = []
     for entry in manifest.artifacts:

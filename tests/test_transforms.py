@@ -79,8 +79,6 @@ class TestAddCursorFrontmatter:
 
     def test_with_globs(self):
         content = "# Rule\n"
-        result = add_cursor_frontmatter(
-            content, description="Test", globs=["*.py", "*.js"]
-        )
+        result = add_cursor_frontmatter(content, description="Test", globs=["*.py", "*.js"])
         assert "globs:" in result
         assert "*.py" in result
