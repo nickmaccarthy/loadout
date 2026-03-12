@@ -297,20 +297,25 @@ git clone https://github.com/nickmaccarthy/loadout.git
 cd loadout
 
 # uv (recommended)
-uv pip install -e ".[dev,interactive]"
+uv sync --all-extras
 
 # pip
 pip install -e ".[dev,interactive]"
 
+# Set up pre-commit hooks
+uv run pre-commit install
+
+# Run all pre-commit checks (ruff, mypy, formatting, etc.)
+uv run pre-commit run --all-files
+
 # Run tests
-pytest
+uv run pytest
 
-# Type check
-mypy src/
-
-# Lint
-ruff check src/
+# Run tests with coverage
+uv run pytest --cov=loadout --cov-report=term-missing
 ```
+
+> 💡 **Pre-commit hooks** run automatically on every `git commit`, catching lint errors, type issues, and formatting problems before they hit CI.
 
 ---
 
