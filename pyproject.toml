@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "agent-loadout"
+name = "loadout"
 dynamic = ["version"]
 description = "Install artifacts (skills, rules, agents, commands) into coding agents"
 readme = "README.md"
