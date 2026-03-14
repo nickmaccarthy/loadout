@@ -3,13 +3,47 @@
 from pathlib import Path
 from unittest.mock import patch
 
+from loadout.adapters import AgentAdapter
 from loadout.callbacks import NoOpCallbacks
 from loadout.installer import install, install_all
 from loadout.models import (
     Artifact,
+    ArtifactType,
     DetectedAgent,
 )
-from loadout.registry import get_default_registry
+from loadout.registry import AdapterRegistry, get_default_registry
+
+
+class ExplodingAdapter(AgentAdapter):
+    @property
+    def agent_name(self) -> str:
+        return "boom"
+
+    @property
+    def display_name(self) -> str:
+        return "Boom"
+
+    @property
+    def config_dir_name(self) -> str:
+        return ".boom"
+
+    def supported_artifact_types(self) -> set[ArtifactType]:
+        return {ArtifactType.SKILL}
+
+    def detect(self) -> DetectedAgent | None:
+        return None
+
+    def get_target_path(self, artifact: Artifact, config_dir: Path) -> Path:
+        return config_dir / artifact.name
+
+    def transform_content(self, artifact: Artifact, content: str) -> str:
+        return content
+
+    def transform_filename(self, artifact: Artifact, filename: str) -> str:
+        return filename
+
+    def install(self, artifact: Artifact, agent: DetectedAgent, force: bool = False):
+        raise RuntimeError("adapter exploded")
 
 
 class TestInstall:
@@ -78,6 +112,18 @@ class TestInstall:
         )
         summary = install([sample_skill_artifact], [unknown])
         assert len(summary.skipped) == 1
+
+    def test_install_catches_adapter_exceptions(
+        self, sample_skill_artifact: Artifact, tmp_home: Path
+    ):
+        registry = AdapterRegistry()
+        registry.register(ExplodingAdapter())
+        agent = DetectedAgent(name="boom", config_dir=tmp_home / ".boom")
+
+        summary = install([sample_skill_artifact], [agent], registry=registry)
+
+        assert len(summary.failed) == 1
+        assert summary.failed[0].error == "adapter exploded"
 
 
 class TestInstallAll:

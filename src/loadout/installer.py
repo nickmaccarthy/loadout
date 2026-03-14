@@ -64,7 +64,15 @@ def install(
             adapter = registry.get(agent.name)
             cb.on_install_started(artifact, agent)
 
-            result = adapter.install(artifact, agent, force=force)
+            try:
+                result = adapter.install(artifact, agent, force=force)
+            except Exception as e:
+                result = InstallResult(
+                    artifact=artifact,
+                    agent=agent,
+                    status=InstallStatus.FAILED,
+                    error=str(e),
+                )
             summary.results.append(result)
 
             if result.status == InstallStatus.INSTALLED:

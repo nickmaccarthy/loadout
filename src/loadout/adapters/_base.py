@@ -86,13 +86,9 @@ class _BaseFileAdapter(AgentAdapter):
         source: Path,
         target_path: Path,
     ) -> InstallResult:
-        content = source.read_text(encoding="utf-8")
-        transformed = self.transform_content(artifact, content)
-
         final_name = self.transform_filename(artifact, target_path.name)
         final_path = target_path.parent / final_name
-
-        final_path.write_text(transformed, encoding="utf-8")
+        self._copy_file(source, final_path, artifact)
 
         return InstallResult(
             artifact=artifact,
@@ -120,12 +116,9 @@ class _BaseFileAdapter(AgentAdapter):
                 dst_file = target_path / rel
                 dst_file.parent.mkdir(parents=True, exist_ok=True)
 
-                content = src_file.read_text(encoding="utf-8")
-                transformed = self.transform_content(artifact, content)
-
                 final_name = self.transform_filename(artifact, dst_file.name)
                 final_path = dst_file.parent / final_name
-                final_path.write_text(transformed, encoding="utf-8")
+                self._copy_file(src_file, final_path, artifact)
 
         return InstallResult(
             artifact=artifact,
@@ -142,3 +135,15 @@ class _BaseFileAdapter(AgentAdapter):
             ArtifactType.AGENT: "agents",
             ArtifactType.COMMAND: "commands",
         }[artifact_type]
+
+    def _copy_file(self, source: Path, destination: Path, artifact: Artifact) -> None:
+        """Copy a file, transforming UTF-8 text while preserving binary files."""
+        try:
+            content = source.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            shutil.copy2(source, destination)
+            return
+
+        transformed = self.transform_content(artifact, content)
+        destination.write_text(transformed, encoding="utf-8")
+        shutil.copystat(source, destination)

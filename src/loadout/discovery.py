@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
+from pydantic import ValidationError
 
 from loadout._transforms import parse_frontmatter
 from loadout.exceptions import ArtifactNotFoundError, ManifestError
@@ -60,7 +61,10 @@ def _discover_from_manifest(manifest_path: Path, source_dir: Path) -> list[Artif
     if not isinstance(raw, dict) or "artifacts" not in raw:
         raise ManifestError("Manifest must contain an 'artifacts' key")
 
-    manifest = Manifest(artifacts=[ManifestArtifact(**entry) for entry in raw["artifacts"]])
+    try:
+        manifest = Manifest(artifacts=[ManifestArtifact(**entry) for entry in raw["artifacts"]])
+    except (TypeError, ValidationError) as e:
+        raise ManifestError(f"Invalid manifest structure: {e}") from e
 
     artifacts = []
     for entry in manifest.artifacts:
