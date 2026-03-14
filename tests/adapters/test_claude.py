@@ -88,6 +88,30 @@ class TestClaudeCodeAdapter:
         assert (result.target_path / "SKILL.md").exists()
         assert (result.target_path / "helper.py").exists()
 
+    def test_install_skill_directory_with_binary_file(self, tmp_home: Path, tmp_path: Path):
+        skill_dir = tmp_path / "binary-skill"
+        skill_dir.mkdir()
+        (skill_dir / "SKILL.md").write_text("# Skill\n", encoding="utf-8")
+        expected_bytes = b"\xff\xfe\x00\x01"
+        (skill_dir / "logo.bin").write_bytes(expected_bytes)
+
+        agent = DetectedAgent(
+            name="claude",
+            config_dir=tmp_home / ".claude",
+            display_name="Claude Code",
+        )
+        artifact = Artifact(
+            name="binary-skill",
+            artifact_type=ArtifactType.SKILL,
+            source_path=skill_dir,
+        )
+
+        result = self.adapter.install(artifact, agent)
+
+        assert result.status == InstallStatus.INSTALLED
+        assert result.target_path is not None
+        assert (result.target_path / "logo.bin").read_bytes() == expected_bytes
+
     def test_content_unchanged(self, tmp_path: Path):
         artifact = Artifact(
             name="test",

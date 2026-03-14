@@ -78,6 +78,16 @@ class TestDiscoverArtifacts:
         with pytest.raises(ManifestError, match="artifacts"):
             discover_artifacts(artifacts_dir)
 
+    def test_invalid_manifest_entry_raises_manifest_error(self, tmp_path: Path):
+        artifacts_dir = tmp_path / "artifacts"
+        artifacts_dir.mkdir()
+        (artifacts_dir / "loadout.yaml").write_text(
+            "artifacts:\n  - name: broken\n    path: missing-type\n"
+        )
+
+        with pytest.raises(ManifestError, match="Invalid manifest structure"):
+            discover_artifacts(artifacts_dir)
+
 
 class TestDetectAgents:
     def test_detects_agents(self, tmp_home: Path):
