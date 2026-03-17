@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-from loadout.models import Artifact, DetectedAgent, InstallResult
+from loadout.models import Artifact, CheckResult, DetectedAgent, InstallResult
 
 
 @runtime_checkable
@@ -28,6 +28,8 @@ class LoadoutCallbacks(Protocol):
 
     def on_install_failed(self, result: InstallResult) -> None: ...
 
+    def on_check_complete(self, result: CheckResult) -> None: ...
+
 
 class NoOpCallbacks:
     """Default no-op implementation of LoadoutCallbacks."""
@@ -48,4 +50,7 @@ class NoOpCallbacks:
         pass
 
     def on_install_failed(self, result: InstallResult) -> None:
+        pass
+
+    def on_check_complete(self, result: CheckResult) -> None:
         pass

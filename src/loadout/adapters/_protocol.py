@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from loadout.models import Artifact, ArtifactType, DetectedAgent, InstallResult
+from loadout.models import Artifact, ArtifactType, CheckResult, DetectedAgent, InstallResult
 
 
 class AgentAdapter(ABC):
@@ -59,3 +59,7 @@ class AgentAdapter(ABC):
         self, artifact: Artifact, agent: DetectedAgent, force: bool = False
     ) -> InstallResult:
         """Install an artifact to this agent."""
+
+    @abstractmethod
+    def check(self, artifact: Artifact, agent: DetectedAgent) -> CheckResult:
+        """Check if an installed artifact is current, stale, or missing."""

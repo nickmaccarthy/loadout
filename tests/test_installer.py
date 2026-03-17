@@ -9,6 +9,8 @@ from loadout.installer import install, install_all
 from loadout.models import (
     Artifact,
     ArtifactType,
+    CheckResult,
+    CheckStatus,
     DetectedAgent,
 )
 from loadout.registry import AdapterRegistry, get_default_registry
@@ -44,6 +46,9 @@ class ExplodingAdapter(AgentAdapter):
 
     def install(self, artifact: Artifact, agent: DetectedAgent, force: bool = False):
         raise RuntimeError("adapter exploded")
+
+    def check(self, artifact: Artifact, agent: DetectedAgent) -> CheckResult:
+        return CheckResult(artifact=artifact, agent=agent, status=CheckStatus.UNKNOWN)
 
 
 class TestInstall:
