@@ -3,6 +3,7 @@
 from loadout._version import __version__
 from loadout.adapters import AgentAdapter, ClaudeCodeAdapter, CursorAdapter, OpenCodeAdapter
 from loadout.callbacks import LoadoutCallbacks, NoOpCallbacks
+from loadout.checker import check, check_all
 from loadout.discovery import detect_agents, discover_artifacts
 from loadout.exceptions import (
     AdapterAlreadyRegisteredError,
@@ -18,6 +19,9 @@ from loadout.models import (
     Artifact,
     ArtifactFrontmatter,
     ArtifactType,
+    CheckResult,
+    CheckStatus,
+    CheckSummary,
     DetectedAgent,
     InstallResult,
     InstallStatus,
@@ -36,6 +40,9 @@ __all__ = [
     # Callbacks
     "LoadoutCallbacks",
     "NoOpCallbacks",
+    # Checker
+    "check",
+    "check_all",
     # Discovery
     "detect_agents",
     "discover_artifacts",
@@ -55,6 +62,9 @@ __all__ = [
     "Artifact",
     "ArtifactFrontmatter",
     "ArtifactType",
+    "CheckResult",
+    "CheckStatus",
+    "CheckSummary",
     "DetectedAgent",
     "InstallResult",
     "InstallStatus",

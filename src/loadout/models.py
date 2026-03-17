@@ -88,6 +88,48 @@ class InstallSummary(BaseModel):
         return [r for r in self.results if r.status == InstallStatus.ALREADY_EXISTS]
 
 
+class CheckStatus(str, Enum):
+    """Result status of an artifact check."""
+
+    CURRENT = "current"
+    STALE = "stale"
+    MISSING = "missing"
+    UNKNOWN = "unknown"
+
+
+class CheckResult(BaseModel):
+    """Result of checking a single artifact against a single agent."""
+
+    artifact: Artifact
+    agent: DetectedAgent
+    status: CheckStatus
+    source_hash: str | None = None
+    installed_hash: str | None = None
+    target_path: Path | None = None
+
+
+class CheckSummary(BaseModel):
+    """Summary of a batch check operation."""
+
+    results: list[CheckResult] = Field(default_factory=list)
+
+    @property
+    def current(self) -> list[CheckResult]:
+        return [r for r in self.results if r.status == CheckStatus.CURRENT]
+
+    @property
+    def stale(self) -> list[CheckResult]:
+        return [r for r in self.results if r.status == CheckStatus.STALE]
+
+    @property
+    def missing(self) -> list[CheckResult]:
+        return [r for r in self.results if r.status == CheckStatus.MISSING]
+
+    @property
+    def unknown(self) -> list[CheckResult]:
+        return [r for r in self.results if r.status == CheckStatus.UNKNOWN]
+
+
 class ManifestArtifact(BaseModel):
     """An artifact entry in a loadout.yaml manifest."""
 
